@@ -5,7 +5,7 @@ RUN apt-get update \
  && apt-get install -y curl wget \
  && rm -rf /var/lib/apt/lists/*
 
-ENV ICINGA2_VERSION=2.9.1
+ENV ICINGA2_VERSION=2.8.4
 
 RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && echo "deb http://packages.icinga.com/ubuntu icinga-xenial main" >/etc/apt/sources.list.d/icinga.list \
