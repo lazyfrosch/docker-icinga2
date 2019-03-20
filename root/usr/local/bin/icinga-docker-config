@@ -1,0 +1,104 @@
+#!/bin/bash
+
+set -eu
+
+: "${ICINGA_NODENAME:=$(hostname -f)}"
+: "${ICINGA_CA_ENABLE:=false}"
+: "${ICINGA_CA_TICKET_SALT:=}"
+: "${ICINGA_FEATURE_API:=${ICINGA_CA_ENABLE}}"
+
+icinga_data=/var/lib/icinga2
+icinga_config=/etc/icinga2
+
+set_const() {
+  local name="$1"
+  local val="$2"
+
+  local file="${icinga_config}/constants.conf"
+
+  local line="const ${name} = \"${val}\""
+  if grep -qP "^(//\\s*)?const\\s+${name}\\s+" "${file}"; then
+    if ! grep -qP "^(//\\s*)?const\\s+${name}\\s+=\\s+\"${val}\"\\s*" "${file}"; then
+      echo "Setting constant ${name} in ${file}"
+      sed -ir "s~^\\(//\\s*\\)\\?const\\s\\+${name}\\s\\+=.*~const ${name} = \"${val}\"~" "${file}"
+    fi
+  else
+    echo "Adding constant ${name} to ${file}"
+    echo "${line}" >>"${file}"
+  fi
+}
+
+parse_api_users() {
+  local pattern="ICINGA_API_USER_"
+  local line user pass
+
+  while read -r line; do
+    line="${line#${pattern}}"
+    user="${line%=*}"
+    pass="${line#*=}"
+
+    create_api_user "${user}" "${pass}"
+  done < <(set | grep "^${pattern}")
+}
+
+create_api_user() {
+  local user="$1"
+  local password="$2"
+  local path="${icinga_config}/conf.d/api-users"
+  local file="${path}/${user}.conf"
+
+  [ -d "${path}" ] || mkdir "${path}"
+
+  content="
+# Managed by icinga-docker-config
+
+object ApiUser \"${user}\" {
+  password = \"${password}\"
+  permissions = [ \"*\" ]
+}
+"
+  # TODO
+  #if [ -f "${file}"]; then
+  #fi
+
+  echo "Configuring API user ${user}"
+  echo "${content}" >"${file}"
+}
+
+set_const NodeName "${ICINGA_NODENAME}"
+
+if [ "${ICINGA_CA_ENABLE}" = true ]; then
+  if [ ! -d "${icinga_data}/ca" ]; then
+    echo "Creating new CA"
+    icinga2 pki new-ca
+  fi
+
+  ca="${icinga_data}/certs/ca.crt"
+  crt="${icinga_data}/certs/${ICINGA_NODENAME}.crt"
+  csr="${icinga_data}/certs/${ICINGA_NODENAME}.csr"
+  key="${icinga_data}/certs/${ICINGA_NODENAME}.key"
+
+  if [ ! -f "${ca}" ]; then
+    cp -v "${icinga_data}/ca/ca.crt" "${ca}"
+  fi
+
+  if [ ! -f "${crt}" ]; then
+    icinga2 pki new-cert --cn "${ICINGA_NODENAME}" --key "${key}" --csr "${csr}"
+    icinga2 pki sign-csr --csr "${csr}" --cert "${crt}"
+  fi
+
+  set_const TicketSalt "${ICINGA_CA_TICKET_SALT}"
+else
+  set_const TicketSalt ""
+fi
+
+if [ "${ICINGA_FEATURE_API}" = true ]; then
+  icinga2 feature enable api
+else
+  icinga2 feature disable api
+fi
+
+parse_api_users
+
+
+# vi: ts=2 sw=2 expandtab :

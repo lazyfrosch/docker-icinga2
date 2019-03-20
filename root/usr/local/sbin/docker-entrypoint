@@ -13,4 +13,6 @@ ensure_icinga_dir "${ICINGA2_CONFDIR}/zones.d"
 ensure_icinga_dir "${ICINGA2_DATADIR}/api"
 ensure_icinga_dir "${ICINGA2_DATADIR}/certs"
 
+icinga-docker-config
+
 exec "$@"
