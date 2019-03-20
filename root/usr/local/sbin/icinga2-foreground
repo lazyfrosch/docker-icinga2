@@ -4,16 +4,6 @@ set -e
 
 rundir=/run/icinga2
 pidfile="$rundir/icinga2.pid"
-user=nagios
-group=nagios
-
-if [ ! -d "$rundir" ]; then
-  mkdir "$rundir"
-  chown "$user.$group" "$rundir"
-fi
-
-touch "$pidfile"
-chown "$user.$group" "$pidfile"
 
 if ! /usr/sbin/icinga2 daemon -d "$@"; then
   echo "icinga2 failed to start!" >&2

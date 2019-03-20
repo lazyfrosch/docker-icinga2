@@ -2,7 +2,7 @@ FROM ubuntu:bionic
 
 RUN apt-get update \
  && apt-get upgrade -y \
- && apt-get install -y curl wget \
+ && apt-get install -y curl wget gnupg2 \
  && rm -rf /var/lib/apt/lists/*
 
 ENV ICINGA2_VERSION=2.10.4
@@ -12,14 +12,21 @@ RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && apt-get update \
  && I2VER="${ICINGA2_VERSION}-1.bionic" DEBIAN_FRONTEND=noninteractive bash -c \
     'apt-get install -y --no-install-recommends icinga2{,-bin,-common,-ido-mysql}="${I2VER}" monitoring-plugins' \
+ && apt-get install -y fakeroot \
+ && rm -rf /var/lib/apt/lists/* \
  && rm -rf /etc/icinga2/conf.d/* \
  && rm -rf /etc/icinga2/zones.d/* \
- && rm -rf /var/lib/apt/lists/*
+ && chown -R nagios.nagios /etc/icinga2 \
+ && mkdir /run/icinga2 \
+ && chown nagios.nagios /run/icinga2
 
 VOLUME /var/lib/icinga2
+VOLUME /var/log/icinga2
 
 COPY root/ /
-ENTRYPOINT ["/entrypoint.sh"]
+
+USER nagios
+ENTRYPOINT ["docker-entrypoint"]
 
 EXPOSE 5665
 CMD ["icinga2-foreground"]
