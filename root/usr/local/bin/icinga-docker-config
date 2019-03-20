@@ -6,6 +6,8 @@ set -eu
 : "${ICINGA_CA_ENABLE:=false}"
 : "${ICINGA_CA_TICKET_SALT:=}"
 : "${ICINGA_FEATURE_API:=${ICINGA_CA_ENABLE}}"
+: "${ICINGA_ENABLE_CHECKS:=true}"
+: "${ICINGA_CONCURRENT_CHECKS:=}"
 
 icinga_data=/var/lib/icinga2
 icinga_config=/etc/icinga2
@@ -65,7 +67,24 @@ object ApiUser \"${user}\" {
   echo "${content}" >"${file}"
 }
 
+update_application_config() {
+  local file="${icinga_config}/conf.d/app.conf"
+
+  content="
+# Managed by icinga-docker-config
+
+object IcingaApplication \"app\" {
+  enable_host_checks = ${ICINGA_ENABLE_CHECKS}
+  enable_service_checks = ${ICINGA_ENABLE_CHECKS}
+}
+"
+
+  echo "Configuring config file ${file}"
+  echo "${content}" >"${file}"
+}
+
 set_const NodeName "${ICINGA_NODENAME}"
+set_const MaxConcurrentChecks "${ICINGA_CONCURRENT_CHECKS}"
 
 if [ "${ICINGA_CA_ENABLE}" = true ]; then
   if [ ! -d "${icinga_data}/ca" ]; then
@@ -99,6 +118,6 @@ else
 fi
 
 parse_api_users
-
+update_application_config
 
 # vi: ts=2 sw=2 expandtab :
