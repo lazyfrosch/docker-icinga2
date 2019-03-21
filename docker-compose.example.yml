@@ -1,0 +1,38 @@
+version: '2'
+
+services:
+  icinga2:
+    image: lazyfrosch/icinga2
+    build: .
+    depends_on:
+      - db
+    environment:
+      ICINGA_NODENAME: icinga2.localdomain
+      ICINGA_CA_ENABLE: 'true'
+      ICINGA_CA_TICKET_SALT: yoloops
+      ICINGA_API_USER_admin: test
+      ICINGA_ENABLE_CHECKS: 'false'
+      ICINGA_CONCURRENT_CHECKS: 50
+      ICINGA_IDO_ENABLE: 'true'
+      ICINGA_IDO_HOST: db
+      ICINGA_IDO_USERNAME: icinga2
+      ICINGA_IDO_PASSWORD: rosebud
+      ICINGA_IDO_INSTALL: 'true'
+    volumes:
+      - icinga_state:/var/lib/icinga2
+      - icinga_log:/var/log/icinga2
+
+  db:
+    image: mariadb:10.2
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: onlyforadmin
+      MYSQL_DATABASE: icinga2
+      MYSQL_USER: icinga2
+      MYSQL_PASSWORD: rosebud
+
+volumes:
+  icinga_state:
+  icinga_log:
+  db_data:
