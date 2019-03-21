@@ -8,9 +8,16 @@ set -eu
 : "${ICINGA_FEATURE_API:=${ICINGA_CA_ENABLE}}"
 : "${ICINGA_ENABLE_CHECKS:=true}"
 : "${ICINGA_CONCURRENT_CHECKS:=}"
+: "${ICINGA_IDO_ENABLE:=false}"
+: "${ICINGA_IDO_HOST:=localhost}"
+: "${ICINGA_IDO_NAME:=icinga2}"
+: "${ICINGA_IDO_USERNAME:=icinga2}"
+: "${ICINGA_IDO_PASSWORD:=icinga2}"
+: "${ICINGA_IDO_PORT:=3306}"
 
 icinga_data=/var/lib/icinga2
 icinga_config=/etc/icinga2
+schema_mysql=/usr/share/icinga2-ido-mysql/schema/mysql.sql
 
 set_const() {
   local name="$1"
@@ -83,6 +90,50 @@ object IcingaApplication \"app\" {
   echo "${content}" >"${file}"
 }
 
+update_ido_config() {
+  local file="${icinga_config}/features-available/ido-mysql.conf"
+
+  content="
+# Managed by icinga-docker-config
+
+library \"db_ido_mysql\"
+
+object IdoMysqlConnection \"ido-mysql\" {
+  host     = \"${ICINGA_IDO_HOST}\",
+  database = \"${ICINGA_IDO_NAME}\"
+  user     = \"${ICINGA_IDO_USERNAME}\",
+  password = \"${ICINGA_IDO_PASSWORD}\",
+  port     = \"${ICINGA_IDO_PORT}\",
+}
+"
+
+  echo "Configuring config file ${file}"
+  echo "${content}" >"${file}"
+}
+
+mysql() {
+  MYSQL_PWD="${ICINGA_IDO_PASSWORD}" command mysql \
+    -h "${ICINGA_IDO_HOST}" -P "${ICINGA_IDO_PORT}" \
+    -u "${ICINGA_IDO_USERNAME}"\
+    "${ICINGA_IDO_NAME}" "$@"
+}
+
+test_mysql_connection() {
+  echo "Checking IDO Database connection"
+  wait-for-tcp "${ICINGA_IDO_HOST}" "${ICINGA_IDO_PORT}"
+  if ! mysql -e "SELECT 1" >/dev/null; then
+    echo "Could not connect to database" >&2
+    exit 1
+  fi
+}
+
+check_ido_schema() {
+  if ! mysql -e "SHOW TABLES LIKE 'icinga_dbversion';" | grep -q icinga_dbversion; then
+    echo "Installing IDO schema"
+    mysql < "${schema_mysql}"
+  fi
+}
+
 set_const NodeName "${ICINGA_NODENAME}"
 set_const MaxConcurrentChecks "${ICINGA_CONCURRENT_CHECKS}"
 
@@ -119,5 +170,14 @@ fi
 
 parse_api_users
 update_application_config
+
+if [ "${ICINGA_IDO_ENABLE}" = true ]; then
+  update_ido_config
+  test_mysql_connection
+  check_ido_schema
+  icinga2 feature enable ido-mysql
+else
+  icinga2 feature disable ido-mysql
+fi
 
 # vi: ts=2 sw=2 expandtab :

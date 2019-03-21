@@ -12,7 +12,7 @@ RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && apt-get update \
  && I2VER="${ICINGA2_VERSION}-1.bionic" DEBIAN_FRONTEND=noninteractive bash -c \
     'apt-get install -y --no-install-recommends icinga2{,-bin,-common,-ido-mysql}="${I2VER}" monitoring-plugins' \
- && apt-get install -y fakeroot \
+ && apt-get install -y fakeroot default-mysql-client netcat-openbsd \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /etc/icinga2/conf.d/* \
  && rm -rf /etc/icinga2/zones.d/* \
