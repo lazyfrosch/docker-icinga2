@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ICINGA2_CONFDIR=/etc/icinga2
 ICINGA2_DATADIR=/var/lib/icinga2
 
@@ -13,6 +15,8 @@ ensure_icinga_dir "${ICINGA2_CONFDIR}/zones.d"
 ensure_icinga_dir "${ICINGA2_DATADIR}/api"
 ensure_icinga_dir "${ICINGA2_DATADIR}/certs"
 
-icinga-docker-config
+if [ "${ICINGA_NO_CONFIG}" != true ]; then
+  icinga-docker-config
+fi
 
 exec "$@"
