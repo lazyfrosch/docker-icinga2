@@ -14,6 +14,7 @@ set -eu
 : "${ICINGA_IDO_USERNAME:=icinga2}"
 : "${ICINGA_IDO_PASSWORD:=icinga2}"
 : "${ICINGA_IDO_PORT:=3306}"
+: "${ICINGA_IDO_INSTALL:=false}"
 
 icinga_data=/var/lib/icinga2
 icinga_config=/etc/icinga2
@@ -174,7 +175,9 @@ update_application_config
 if [ "${ICINGA_IDO_ENABLE}" = true ]; then
   update_ido_config
   test_mysql_connection
-  check_ido_schema
+  if [ "${ICINGA_IDO_INSTALL}" = true ]; then
+    check_ido_schema
+  fi
   icinga2 feature enable ido-mysql
 else
   icinga2 feature disable ido-mysql
