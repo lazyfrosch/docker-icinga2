@@ -38,6 +38,19 @@ set_const() {
   fi
 }
 
+parse_constants() {
+  local pattern="ICINGA_CONSTANT_"
+  local line const value
+
+  while read -r line; do
+    line="${line#${pattern}}"
+    const="${line%=*}"
+    value="${line#*=}"
+
+    set_const "${const}" "${value}"
+  done < <(set | grep "^${pattern}")
+}
+
 parse_api_users() {
   local pattern="ICINGA_API_USER_"
   local line user pass
@@ -137,6 +150,8 @@ check_ido_schema() {
 
 set_const NodeName "${ICINGA_NODENAME}"
 set_const MaxConcurrentChecks "${ICINGA_CONCURRENT_CHECKS}"
+
+parse_constants
 
 if [ "${ICINGA_CA_ENABLE}" = true ]; then
   if [ ! -d "${icinga_data}/ca" ]; then
