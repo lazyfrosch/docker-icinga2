@@ -16,7 +16,7 @@ if [ ! -f "$pidfile" ]; then
 fi
 
 handleexit() {
-  for _ in $(seq 1 5); do
+  for _ in $(seq 1 10); do
     [ -f "$pidfile" ] || break
     pid="$(cat "$pidfile")"
     if kill -0 "$pid" &>/dev/null; then
