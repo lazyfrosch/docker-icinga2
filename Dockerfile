@@ -20,6 +20,11 @@ RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && mkdir /run/icinga2 \
  && chown nagios.nagios /run/icinga2
 
+# TODO: remove when added to changelog
+RUN gzip -d /usr/share/doc/icinga2/changelog.Debian.gz \
+ && sed -i 's/Update to 2.8.4/\0 (CVE-2017-16933)/' /usr/share/doc/icinga2/changelog.Debian \
+ && gzip /usr/share/doc/icinga2/changelog.Debian
+
 VOLUME /var/lib/icinga2
 VOLUME /var/log/icinga2
 
