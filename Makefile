@@ -1,14 +1,22 @@
 FROM_IMAGE := $(shell grep -P ^FROM Dockerfile | cut -d' ' -f2)
-IMAGE := lazyfrosch/icinga2
+
+GIT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+
+ifeq ($(GIT_BRANCH),master)
+  DOCKER_TAG := latest
+else
+  DOCKER_TAG := $(GIT_BRANCH)
+endif
+
+IMAGE := lazyfrosch/icinga2:$(DOCKER_TAG)
 
 all: pull build
 
 pull:
-	#docker pull $(IMAGE) || true
+	docker pull $(IMAGE) || true
 	docker pull $(FROM_IMAGE)
 
 build:
-	#docker build --rm --cache-from $(IMAGE) --tag $(IMAGE) .
 	docker build --rm --tag $(IMAGE) .
 
 push:
