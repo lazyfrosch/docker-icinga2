@@ -5,13 +5,13 @@ RUN apt-get update \
  && apt-get install -y curl wget gnupg2 \
  && rm -rf /var/lib/apt/lists/*
 
-ENV ICINGA2_VERSION=2.10.4
+ENV ICINGA2_VERSION=2.10.4-1.bionic
 
 RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && echo "deb http://packages.icinga.com/ubuntu icinga-bionic main" >/etc/apt/sources.list.d/icinga.list \
  && apt-get update \
- && I2VER="${ICINGA2_VERSION}-1.bionic" DEBIAN_FRONTEND=noninteractive bash -c \
-    'apt-get install -y --no-install-recommends icinga2{,-bin,-common,-ido-mysql}="${I2VER}" monitoring-plugins' \
+ && DEBIAN_FRONTEND=noninteractive bash -c \
+    'apt-get install -y --no-install-recommends icinga2{,-bin,-common,-ido-mysql}="${ICINGA2_VERSION}" monitoring-plugins' \
  && apt-get install -y fakeroot default-mysql-client netcat-openbsd \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /etc/icinga2/conf.d/* \
