@@ -2,9 +2,10 @@ version: '2'
 
 services:
   icinga2:
-    image: lazyfrosch/icinga2
+    image: lazyfrosch/icinga2:2.12
     build: .
     depends_on:
+      - redis
       - db
     environment:
       ICINGA_NODENAME: icinga2.localdomain
@@ -18,9 +19,14 @@ services:
       ICINGA_IDO_USERNAME: icinga2
       ICINGA_IDO_PASSWORD: rosebud
       ICINGA_IDO_INSTALL: 'true'
+
+      ICINGA_DB_ENABLE: 'true'
     volumes:
       - icinga_state:/var/lib/icinga2
       - icinga_log:/var/log/icinga2
+
+  redis:
+    image: redis:5-alpine
 
   db:
     image: mariadb:10.2
