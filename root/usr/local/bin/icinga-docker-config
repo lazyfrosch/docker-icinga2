@@ -19,6 +19,7 @@ set -eu
 : "${ICINGADB_REDIS_HOST:=redis}"
 : "${ICINGADB_REDIS_PORT:=6379}" # Note: This is the standard redis port - Icinga would use 8380 by default
 : "${ICINGADB_REDIS_PASSWORD:=}"
+: "${ICINGA_ENABLE_MAINLOG:=false}"
 
 icinga_data=/var/lib/icinga2
 icinga_config=/etc/icinga2
@@ -224,6 +225,12 @@ if [ "${ICINGA_IDO_ENABLE}" = true ]; then
   icinga2 feature enable ido-mysql
 else
   icinga2 feature disable ido-mysql
+fi
+
+if [[ "$ICINGA_ENABLE_MAINLOG" = true ]]; then
+  icinga2 feature enable mainlog
+else
+  icinga2 feature disable mainlog
 fi
 
 # vi: ts=2 sw=2 expandtab :
