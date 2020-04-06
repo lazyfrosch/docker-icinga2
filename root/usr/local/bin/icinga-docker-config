@@ -15,10 +15,10 @@ set -eu
 : "${ICINGA_IDO_PASSWORD:=icinga2}"
 : "${ICINGA_IDO_PORT:=3306}"
 : "${ICINGA_IDO_INSTALL:=false}"
-: "${ICINGA_DB_ENABLE:=false}"
-: "${ICINGA_DB_HOST:=redis}"
-: "${ICINGA_DB_PORT:=6379}" # Note: This is the standard redis port - Icinga would use 8380 by default
-: "${ICINGA_DB_PASSWORD:=}"
+: "${ICINGADB_REDIS_ENABLE:=false}"
+: "${ICINGADB_REDIS_HOST:=redis}"
+: "${ICINGADB_REDIS_PORT:=6379}" # Note: This is the standard redis port - Icinga would use 8380 by default
+: "${ICINGADB_REDIS_PASSWORD:=}"
 
 icinga_data=/var/lib/icinga2
 icinga_config=/etc/icinga2
@@ -115,9 +115,9 @@ update_icingadb_config() {
 # Managed by icinga-docker-config
 
 object IcingaDB \"icingadb\" {
-  host = \"${ICINGA_DB_HOST}\"
-  port = ${ICINGA_DB_PORT}
-  //password = \"${ICINGA_DB_PASSWORD}\"
+  host = \"${ICINGADB_REDIS_HOST}\"
+  port = ${ICINGADB_REDIS_PORT}
+  //password = \"${ICINGADB_REDIS_PASSWORD}\"
 }
 "
 
@@ -208,7 +208,7 @@ fi
 parse_api_users
 update_application_config
 
-if [ "${ICINGA_DB_ENABLE}" = true ]; then
+if [ "${ICINGADB_REDIS_ENABLE}" = true ]; then
   update_icingadb_config
   icinga2 feature enable icingadb
 else
