@@ -2,13 +2,14 @@ FROM ubuntu:bionic
 
 RUN apt-get update \
  && apt-get upgrade -y \
- && apt-get install -y curl wget gnupg2 \
+ && apt-get install -y curl gnupg2 \
  && rm -rf /var/lib/apt/lists/*
 
-ENV ICINGA2_VERSION=2.11.3-1.bionic
+ENV ICINGA2_VERSION=2.12.0~rc1-1.bionic
 
 RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && echo "deb http://packages.icinga.com/ubuntu icinga-bionic main" >/etc/apt/sources.list.d/icinga.list \
+ && echo "deb http://packages.icinga.com/ubuntu icinga-bionic-testing main" >/etc/apt/sources.list.d/icinga-testing.list \
  && apt-get update \
  && DEBIAN_FRONTEND=noninteractive bash -c \
     'apt-get install -y --no-install-recommends icinga2{,-bin,-common,-ido-mysql}="${ICINGA2_VERSION}" monitoring-plugins' \
