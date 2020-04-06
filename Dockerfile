@@ -22,7 +22,6 @@ RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && chown nagios.nagios /run/icinga2
 
 VOLUME /var/lib/icinga2
-VOLUME /var/log/icinga2
 
 COPY root/ /
 
