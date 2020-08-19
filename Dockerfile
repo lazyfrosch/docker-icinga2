@@ -1,14 +1,14 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 RUN apt-get update \
  && apt-get upgrade -y \
  && apt-get install -y curl gnupg2 \
  && rm -rf /var/lib/apt/lists/*
 
-ENV ICINGA2_VERSION=2.12.0-1.bionic
+ENV ICINGA2_VERSION=2.12.0-1.focal
 
 RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
- && echo "deb http://packages.icinga.com/ubuntu icinga-bionic main" >/etc/apt/sources.list.d/icinga.list \
+ && echo "deb http://packages.icinga.com/ubuntu icinga-focal main" >/etc/apt/sources.list.d/icinga.list \
  && apt-get update \
  && DEBIAN_FRONTEND=noninteractive bash -c \
     'apt-get install -y --no-install-recommends icinga2{,-bin,-common,-ido-mysql}="${ICINGA2_VERSION}" monitoring-plugins' \
