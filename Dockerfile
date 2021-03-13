@@ -5,7 +5,7 @@ RUN apt-get update \
  && apt-get install -y curl gnupg2 \
  && rm -rf /var/lib/apt/lists/*
 
-ENV ICINGA2_VERSION=2.12.0-1.focal
+ENV ICINGA2_VERSION=2.12.3-1.focal
 
 RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && echo "deb http://packages.icinga.com/ubuntu icinga-focal main" >/etc/apt/sources.list.d/icinga.list \
