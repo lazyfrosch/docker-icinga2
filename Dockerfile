@@ -6,6 +6,10 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 ENV ICINGA2_VERSION=2.12.3-1.focal
+ENV UID=101 GID=101
+
+RUN groupadd -g ${GID} nagios \
+ && useradd -g ${GID} -u ${UID} -m -d /var/lib/nagios -s /bin/false nagios
 
 RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && echo "deb http://packages.icinga.com/ubuntu icinga-focal main" >/etc/apt/sources.list.d/icinga.list \
