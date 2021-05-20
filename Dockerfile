@@ -18,7 +18,9 @@ RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
  && rm -rf /etc/icinga2/zones.d/* \
  && chown -R nagios.nagios /etc/icinga2 \
  && mkdir /run/icinga2 \
- && chown nagios.nagios /run/icinga2
+ && chown nagios.nagios /run/icinga2 \
+ && mkdir /var/lib/icinga2/ca \
+ && chown nagios.nagios /var/lib/icinga2/ca
 
 VOLUME /var/lib/icinga2
 

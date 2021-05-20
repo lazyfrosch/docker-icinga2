@@ -176,7 +176,7 @@ set_const MaxConcurrentChecks "${ICINGA_CONCURRENT_CHECKS}"
 parse_constants
 
 if [ "${ICINGA_CA_ENABLE}" = true ]; then
-  if [ ! -d "${icinga_data}/ca" ]; then
+  if [ ! -e "${icinga_data}/ca/ca.crt" ]; then
     echo "Creating new CA"
     icinga2 pki new-ca
   fi
