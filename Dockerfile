@@ -5,7 +5,7 @@ RUN apt-get update \
  && apt-get install -y curl gnupg2 \
  && rm -rf /var/lib/apt/lists/*
 
-ENV ICINGA2_VERSION=2.13.1-1.focal
+ENV ICINGA2_VERSION=2.13.2-1.focal
 ENV UID=101 GID=101
 
 RUN groupadd -g ${GID} nagios \
