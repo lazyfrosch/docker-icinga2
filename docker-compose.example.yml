@@ -2,8 +2,8 @@ version: '2'
 
 services:
   icinga2:
-    image: lazyfrosch/icinga2:2.12
-    build: .
+    image: lazyfrosch/icinga2:latest
+    # build: .
     depends_on:
       - redis
       - db
@@ -26,10 +26,10 @@ services:
       - icinga_log:/var/log/icinga2
 
   redis:
-    image: redis:5-alpine
+    image: redis:alpine
 
   db:
-    image: mariadb:10.2
+    image: mariadb:latest
     volumes:
       - db_data:/var/lib/mysql
     environment:
