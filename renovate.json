@@ -3,5 +3,11 @@
   "extends": [
     "local>lazyfrosch/.github:renovate-config",
     "regexManagers:dockerfileVersions"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["Icinga/icinga2"],
+      "extractVersion": "^v(?<version>\\S+)$"
+    }
   ]
 }
