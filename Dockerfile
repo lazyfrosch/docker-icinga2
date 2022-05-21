@@ -14,7 +14,7 @@ ENV GID=101
 RUN groupadd -g ${GID} nagios \
  && useradd -g ${GID} -u ${UID} -m -d /var/lib/nagios -s /bin/false nagios
 
-RUN curl -LsS https://packages.icinga.com/icinga.key | apt-key add - \
+RUN curl -LsS https://packages.icinga.com/icinga.key | gpg --dearmor >/etc/apt/trusted.gpg.d/icinga.gpg - \
  && . /etc/os-release \
  && echo "deb http://packages.icinga.com/ubuntu icinga-${VERSION_CODENAME} main" >/etc/apt/sources.list.d/icinga.list \
  && apt-get update \
