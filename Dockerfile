@@ -6,7 +6,7 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 
 # renovate: datasource=github-releases depName=Icinga/icinga2
-ENV ICINGA2_VERSION=2.13.5
+ENV ICINGA2_VERSION=2.13.6
 ENV ICINGA2_PACKAGE_VERSION=${ICINGA2_VERSION}-1
 ENV UID=101
 ENV GID=101
