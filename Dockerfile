@@ -19,7 +19,7 @@ RUN curl -LsS https://packages.icinga.com/icinga.key | gpg --dearmor >/etc/apt/t
  && echo "deb http://packages.icinga.com/ubuntu icinga-${VERSION_CODENAME} main" >/etc/apt/sources.list.d/icinga.list \
  && apt-get update \
  && DEBIAN_FRONTEND=noninteractive bash -c \
-    "apt-get install -y --no-install-recommends icinga2{,-bin,-common,-ido-mysql}='${ICINGA2_PACKAGE_VERSION}.${VERSION_CODENAME}' monitoring-plugins" \
+    "apt-get install -y --no-install-recommends icinga2{,-bin,-common,-ido-mysql}='${ICINGA2_PACKAGE_VERSION}+ubuntu${VERSION_ID}' monitoring-plugins" \
  && apt-get install -y --no-install-recommends fakeroot default-mysql-client netcat-openbsd \
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /etc/icinga2/conf.d/* \
